@@ -1,3 +1,4 @@
+from modes.defaultmode import DefaultMode
 
 def main():
     pass
