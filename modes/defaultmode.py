@@ -1,9 +1,10 @@
 from commands.commands import Commands
+from commands.history import CommandHistory
 from utility.colors import Colors
 
 class DefaultMode:
     def __init__(self):
-        print("Initiating default mode")
+        self.history = CommandHistory()
 
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
