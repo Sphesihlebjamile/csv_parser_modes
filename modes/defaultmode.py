@@ -26,7 +26,9 @@ class DefaultMode:
                 cmd = parts[0]
                 args = parts[1:]
 
-                if cmd == Commands.EXIT:
+                if cmd == Commands.INSERT:
+                    pass
+                elif cmd == Commands.EXIT:
                     print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
                     break
                 elif cmd == Commands.SHUTDOWN:
