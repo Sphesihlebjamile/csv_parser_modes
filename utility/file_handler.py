@@ -1,4 +1,5 @@
 import string
+import random
 from pathlib import Path
 from typing import List, Tuple
 
@@ -23,3 +24,18 @@ class File_Handler:
 
     def insert(self, file_path: str, file_name: str) -> None:
         self.files.append((file_path, file_name))
+
+    @staticmethod
+    def generate_filename(base_name: str) -> str:
+        """
+        Generate a random name based on the original filename.
+    
+        Args:
+            original_filename (str): Original filename to base the random name on
+    
+        Returns:
+            str: Random name based on the original filename
+        """
+        # Generate a random suffix of 4 characters
+        random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k = 4))
+        return f"{base_name}_{random_suffix}"
