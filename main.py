@@ -1,7 +1,8 @@
 from modes.defaultmode import DefaultMode
 
 def main():
-    pass
+    default_mode = DefaultMode()
+    default_mode.run()
 
 if __name__ == "__main__":
     main()
