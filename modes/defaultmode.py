@@ -1,3 +1,5 @@
+import sys
+
 from commands.commands import Commands
 from commands.history import CommandHistory
 from utility.colors import Colors
@@ -19,7 +21,19 @@ class DefaultMode:
                 if not command:
                     continue
 
-                continue
+                # Split command into parts
+                parts = command.split()
+                cmd = parts[0]
+                args = parts[1:]
+
+                if cmd == Commands.EXIT:
+                    print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
+                    break
+                elif cmd == Commands.SHUTDOWN:
+                    print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
+                    sys.exit(0)
+                else:
+                    print(f"\n{Colors.FAIL}Error: Unknown command '{cmd}'. Type 'help' to see a list of available commands.{Colors.ENDC}\n")
 
             except KeyboardInterrupt:
                 print(f'\n\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
