@@ -143,6 +143,21 @@ class DefaultMode:
         print()
         return True
 
+    def handle_display_filenames(self) -> bool:
+        """
+        Handle the display-filenames command.
+        """
+        files = self.file_handler.get_files()
+        if not files:
+            print(f"{Colors.WARNING}No files have been added yet.{Colors.ENDC}")
+            return False
+
+        print(f"\n{Colors.HEADER}Registered files:{Colors.ENDC}")
+        for _, display_name in files:
+            print(f"{Colors.GREEN}- {display_name}{Colors.ENDC}")
+        print()
+        return True
+
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
         print(f"{Colors.CYAN}{'-' * 50}{Colors.ENDC}")
@@ -162,8 +177,10 @@ class DefaultMode:
 
                 if cmd == Commands.INSERT:
                     self.handle_insert(args)
-                if cmd == Commands.LOAD:
+                elif cmd == Commands.LOAD:
                     self.handle_load(args)
+                elif cmd == Commands.FILENAMES:
+                    self.handle_display_filenames()
                 elif cmd == Commands.EXIT:
                     print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
                     break
