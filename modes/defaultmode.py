@@ -1,6 +1,6 @@
 import sys
 from typing import List, Tuple
-from pathlib import Path
+from pathlib import Path, WindowsPath
 
 from commands.commands import Commands
 from commands.history import CommandHistory
@@ -76,6 +76,73 @@ class DefaultMode:
         print(f"{Colors.GREEN}Inserted your new file name as '{display_name}'.{Colors.ENDC}")
         return True
 
+    def handle_load(self, args) -> bool:
+        """
+        Handle the load command to load all CSV files from a directory.
+    
+        Args:
+            args (list): Command arguments (directory_path [depth_level|*])
+            file_entries (list): List of file entries
+    
+        Returns:
+            bool: True if command was successful
+        """
+        if not args:
+            print(f"{Colors.FAIL}Error: load command requires a directory path{Colors.ENDC}")
+            return False
+
+        directory_path = args[0]
+        recursive = len(args) > 1 and args[1] == '*'
+
+        # Check if directory exists
+        dir_path = Path(directory_path)
+        if not dir_path.is_dir():
+            print(f"{Colors.FAIL}Error: Directory '{directory_path}' does not exist{Colors.ENDC}")
+            return False
+
+        # Find all CSV files in the directory (recursively if '*' is specified)
+        if recursive:
+            csv_files = list(dir_path.rglob('*.csv'))
+        else:
+            csv_files = list(dir_path.glob('*.csv'))
+
+        if not csv_files:
+            search_msg = "recursively in all subdirectories" if recursive else "in directory"
+            print(f"{Colors.WARNING}No CSV files found {search_msg} '{directory_path}'{Colors.ENDC}")
+            return False
+
+        # Add each CSV file to the file handler and track loaded files with their paths
+        for file_path in csv_files:
+            display_name = Path(file_path).stem
+            is_duplicated = self.file_handler.does_filename_exist(display_name)
+            if is_duplicated:
+                display_name = self.file_handler.generate_filename(display_name)
+            self.file_handler.insert(file_path, display_name)
+
+        # Display the loaded files grouped by directory
+        search_msg = "recursively from" if recursive else "from"
+        print(f"\n{Colors.HEADER}Loaded CSV files {search_msg} '{directory_path}':{Colors.ENDC}")
+
+        # Group files by their parent directory
+        by_directory = {}
+        for file_path, display_name in self.file_handler.get_files():
+            parent = file_path.parent
+            if parent not in by_directory:
+                by_directory[parent] = []
+            by_directory[parent].append(display_name)
+
+        # Print files grouped by directory
+        for directory, files in sorted(by_directory.items()):
+            relative_path = directory.relative_to(dir_path)
+            if str(relative_path) == ".":
+                print(f"\n{Colors.CYAN}Root directory:{Colors.ENDC}")
+            else:
+                print(f"\n{Colors.CYAN}Directory '{relative_path}':{Colors.ENDC}")
+            for display_name in sorted(files):
+                print(f"{Colors.GREEN}- {display_name}{Colors.ENDC}")
+        print()
+        return True
+
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
         print(f"{Colors.CYAN}{'-' * 50}{Colors.ENDC}")
@@ -95,6 +162,8 @@ class DefaultMode:
 
                 if cmd == Commands.INSERT:
                     self.handle_insert(args)
+                if cmd == Commands.LOAD:
+                    self.handle_load(args)
                 elif cmd == Commands.EXIT:
                     print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
                     break

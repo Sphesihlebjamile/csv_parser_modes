@@ -1,13 +1,13 @@
 import string
 import random
-from pathlib import Path
+from pathlib import Path, WindowsPath
 from typing import List, Tuple
 
 class File_Handler:
     def __init__(self):
         self.files: List[Tuple[str, str]] = []
 
-    def get_files(self) -> List[Tuple[str, str]]:
+    def get_files(self) -> List[Tuple[WindowsPath, str]]:
         return self.files
 
     def does_filename_exist(self, file_name: str) -> bool:
