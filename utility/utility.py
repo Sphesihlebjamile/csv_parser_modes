@@ -1,5 +1,7 @@
 import msvcrt
 from commands.history import CommandHistory
+from utility.text_handler import Text_Handler
+from typing import List
 
 class Utility:
     # Utility class to handle user input and other utility functions
@@ -132,3 +134,47 @@ class Utility:
                     continue
 
         return input_text
+
+    @staticmethod
+    def get_column_widths(rows: List[str], max_rows: int = 10) -> List[int]:
+        """
+        Calculate the maximum width needed for each column.
+    
+        Args:
+            rows (list): List of rows from the CSV file
+    
+        Returns:
+            list: List of maximum widths for each column
+        """
+        widths = []
+        for count, row in enumerate(rows):
+            if count == max_rows:
+                break
+            for i, cell in enumerate(row):
+                # Truncate the cell content before calculating width
+                truncated_cell = Text_Handler.truncate_text(cell)
+                if i >= len(widths):
+                    widths.append(len(truncated_cell))
+                else:
+                    widths[i] = max(widths[i], len(truncated_cell))
+        return widths
+
+    @staticmethod
+    def format_row(row, widths):
+        """
+        Format a row with fixed column widths.
+    
+        Args:
+            row (list): Row data
+            widths (list): Column widths
+    
+        Returns:
+            str: Formatted row string
+        """
+        formatted_cells = []
+        for cell, width in zip(row, widths):
+            # Truncate and pad the cell content
+            truncated_cell = Text_Handler.truncate_text(cell)
+            fromatted_cell = truncated_cell.ljust(width)
+            formatted_cells.append(fromatted_cell)
+        return ' | '.join(formatted_cells)

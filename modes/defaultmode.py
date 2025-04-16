@@ -1,6 +1,7 @@
 import sys
+import csv
 from typing import List, Tuple
-from pathlib import Path, WindowsPath
+from pathlib import Path
 
 from commands.commands import Commands
 from commands.history import CommandHistory
@@ -158,6 +159,80 @@ class DefaultMode:
         print()
         return True
 
+    def read_csv_file(self, file_path, display_name, max_data = 10) -> None:
+        """
+        Read and display the contents of a CSV file.
+    
+        Args:
+            file_path (str): Path to the CSV file
+            display_name (str): Custom name to display for the file
+        """
+        try:
+            # Check if file exists
+            if not Path(file_path).exists():
+                print(f"{Colors.FAIL}Error: File '{file_path}' does not exist.{Colors.ENDC}")
+                return
+
+            # Open and read the csv file
+            with open(file_path, 'r', encoding='utf-8') as file:
+                csv_reader = csv.reader(file)
+                rows = list(csv_reader)
+
+                if not rows:
+                    print(f"{Colors.FAIL}Error: CSV file '{file_path}' is empty.{Colors.ENDC}")
+                    return
+
+                # Calculate column widths
+                widths = Utility.get_column_widths(rows, max_rows = max_data)
+
+                # Print file name and table
+                print(f"\n{Colors.HEADER}File: {display_name or file_path}{Colors.ENDC}")
+                separator = "-" * (sum(widths) + (len(widths) * 3) - 1)
+                print(f"{Colors.CYAN}{separator}{Colors.ENDC}")
+                # Print header row in orange and bold
+                print(f"{Colors.ORANGE}{Colors.BOLD}{Utility.format_row(rows[0], widths)}{Colors.ENDC}")
+                print(f"{Colors.CYAN}{separator}{Colors.ENDC}")
+
+                # Print data rows in white
+                for count, row in enumerate(rows[1:]):
+                    if count == max_data:
+                        break
+                    print(f"{Colors.WHITE}{Utility.format_row(row, widths)}{Colors.ENDC}")
+                print(f"{Colors.CYAN}{separator}{Colors.ENDC}")
+                print("\n" + "="*80 + "\n")  # Separator between files
+
+        except Exception as e:
+            print(f"{Colors.FAIL}Error reading the CSV file '{file_path}' {str(e)}{Colors.ENDC}")
+
+    def handle_displa_data(self, args) -> bool | None:
+        """
+        Handle the display-data command.
+    
+        Args:
+            args (list): Command arguments
+            file_entries (list): List of file entries
+        """
+        file_entries = self.file_handler.get_files()
+        if not file_entries:
+            print(f"{Colors.WARNING}No files have been added yet.{Colors.ENDC}")
+            return False
+
+        # Display all files
+        if not args:
+            for file_path, display_name in file_entries:
+                self.read_csv_file(file_path, display_name, max_data = 10)
+            return True
+
+        # Display specific files
+        for filename in args:
+            found = False
+            for file_path, display_name in file_entries:
+                if display_name == filename:
+                    self.read_csv_file(file_path, display_name, max_data = 100)
+                    found = True
+            if not found:
+                print(f"{Colors.FAIL}Error: File '{filename}' not found{Colors.ENDC}")
+
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
         print(f"{Colors.CYAN}{'-' * 50}{Colors.ENDC}")
@@ -181,6 +256,8 @@ class DefaultMode:
                     self.handle_load(args)
                 elif cmd == Commands.FILENAMES:
                     self.handle_display_filenames()
+                elif cmd == Commands.DISPLAY_DATA:
+                    self.handle_displa_data(args)
                 elif cmd == Commands.EXIT:
                     print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
                     break
