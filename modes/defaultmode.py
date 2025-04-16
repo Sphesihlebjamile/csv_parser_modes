@@ -255,6 +255,36 @@ class DefaultMode:
             print(f"{Colors.WHITE}{cmd.ljust(cmd_width)} | {args.ljust(args_width)} | {desc.ljust(desc_width)}{Colors.ENDC}")
         print(f"{Colors.CYAN}{separator}{Colors.ENDC}\n")
 
+    def handle_rename(self, args) -> None:
+        """
+        Handle the rename command to rename a file's display name.
+    
+        Args:
+            args (list): Command arguments (current_name, new_name)
+            file_entries (list): List of file entries
+        """
+        if len(args) != 2:
+            print(f"{Colors.FAIL}Error: rename command requires exactly two arguments: current_name new_name{Colors.ENDC}")
+            return False
+
+        current_name, new_name = args
+
+        # Check if current name exists
+        if not self.file_handler.does_filename_exist(current_name):
+            print(f"{Colors.FAIL}Error: File '{current_name}' not found{Colors.ENDC}")
+            return
+
+        # Check if new name exists
+        if self.file_handler.does_filename_exist(new_name):
+            print(f"{Colors.FAIL}Error: Display name '{new_name}' is already in use{Colors.ENDC}")
+            return
+
+        did_update_succeed = self.file_handler.update_filename(current_name, new_name)
+        if not did_update_succeed:
+            print(f'{Colors.CYAN}Failed to update filename, please try again later.{Colors.ENDC}');
+        else:
+            print(f"{Colors.GREEN}Filename has been renamed from '{current_name}' to '{new_name}'.{Colors.ENDC}")
+
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
         print(f"{Colors.CYAN}{'-' * 50}{Colors.ENDC}")
@@ -280,6 +310,8 @@ class DefaultMode:
                     self.handle_display_filenames()
                 elif cmd == Commands.DISPLAY_DATA:
                     self.handle_displa_data(args)
+                elif cmd == Commands.RENAME:
+                    self.handle_rename(args)
                 elif cmd == Commands.HELP:
                     self.handle_display_help()
                 elif cmd == Commands.EXIT:
