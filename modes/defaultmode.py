@@ -232,6 +232,28 @@ class DefaultMode:
                     found = True
             if not found:
                 print(f"{Colors.FAIL}Error: File '{filename}' not found{Colors.ENDC}")
+    
+    @staticmethod
+    def handle_display_help():
+        """
+        Display help information in a tabular format.
+        """
+        # Caulcilate column widths
+        cmd_width = max(len(cmd[0]) for cmd in Commands.ALL_COMMANDS) + 2
+        args_width = max(len(cmd[1]) for cmd in Commands.ALL_COMMANDS) + 2
+        desc_width = max(len(cmd[2]) for cmd in Commands.ALL_COMMANDS) + 2
+
+        # Print header
+        print(f"\n{Colors.HEADER}Available Commands:{Colors.ENDC}")
+        separator = "-" * (cmd_width + args_width + desc_width + 6) # 6 for separators
+        print(f"{Colors.CYAN}{separator}{Colors.ENDC}")
+        print(f"{Colors.ORANGE}{Colors.BOLD}{'Command'.ljust(cmd_width)} | {'Arguments'.ljust(args_width)} | {'Description'.ljust(desc_width)}{Colors.ENDC}")
+        print(f"{Colors.CYAN}{separator}{Colors.ENDC}")
+
+        # Print commands
+        for cmd, args, desc in Commands.ALL_COMMANDS:
+            print(f"{Colors.WHITE}{cmd.ljust(cmd_width)} | {args.ljust(args_width)} | {desc.ljust(desc_width)}{Colors.ENDC}")
+        print(f"{Colors.CYAN}{separator}{Colors.ENDC}\n")
 
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
@@ -258,6 +280,8 @@ class DefaultMode:
                     self.handle_display_filenames()
                 elif cmd == Commands.DISPLAY_DATA:
                     self.handle_displa_data(args)
+                elif cmd == Commands.HELP:
+                    self.handle_display_help()
                 elif cmd == Commands.EXIT:
                     print(f'\n{Colors.GREEN}Thank you for using CSV Reader!{Colors.ENDC}')
                     break
