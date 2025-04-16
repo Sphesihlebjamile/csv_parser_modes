@@ -1,7 +1,7 @@
 import sys
 import csv
 from typing import List, Tuple
-from pathlib import Path, WindowsPath
+from pathlib import Path
 
 from commands.commands import Commands
 from commands.history import CommandHistory

@@ -1,5 +1,3 @@
-import sys
-
 import msvcrt
 from commands.history import CommandHistory
 from utility.text_handler import Text_Handler
