@@ -1,4 +1,5 @@
 from modes.defaultmode import DefaultMode
+from utility.text_handler import Text_Handler
 
 def main():
     default_mode = DefaultMode()
