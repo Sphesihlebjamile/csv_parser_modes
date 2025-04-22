@@ -1,13 +1,13 @@
 import sys
 import csv
 from typing import List, Tuple
-from pathlib import Path
-
+from pathlib import Path, WindowsPath
 from commands.commands import Commands
 from commands.history import CommandHistory
 from utility.colors import Colors
 from utility.utility import Utility
 from utility.file_handler import File_Handler
+from utility.prompts import Prompts
 
 class DefaultMode:
     def __init__(self):
@@ -33,13 +33,12 @@ class DefaultMode:
         display_name = parts[1] if len(parts) > 1 else None
         return (file_path, display_name)
 
-    def handle_insert(self, args) -> None:
+    def handle_insert(self, args: List[str]) -> None:
         """
         Handle the insert command.
     
         Args:
             args (list): Command arguments
-            file_entries (list): List of file entries
     
         Returns:
             bool: True if command was successful
@@ -77,13 +76,12 @@ class DefaultMode:
         print(f"{Colors.GREEN}Inserted your new file name as '{display_name}'.{Colors.ENDC}")
         return True
 
-    def handle_load(self, args) -> bool:
+    def handle_load(self, args: List[str]) -> bool:
         """
         Handle the load command to load all CSV files from a directory.
     
         Args:
             args (list): Command arguments (directory_path [depth_level|*])
-            file_entries (list): List of file entries
     
         Returns:
             bool: True if command was successful
@@ -146,7 +144,7 @@ class DefaultMode:
 
     def handle_display_filenames(self) -> bool:
         """
-        Handle the display-filenames command.
+        Handle the display-filenames command to print available filenames to the CLI.
         """
         files = self.file_handler.get_files()
         if not files:
@@ -159,7 +157,7 @@ class DefaultMode:
         print()
         return True
 
-    def read_csv_file(self, file_path, display_name, max_data = 10) -> None:
+    def read_csv_file(self, file_path: WindowsPath, display_name: str, max_data: int = 10) -> None:
         """
         Read and display the contents of a CSV file.
     
@@ -204,13 +202,12 @@ class DefaultMode:
         except Exception as e:
             print(f"{Colors.FAIL}Error reading the CSV file '{file_path}' {str(e)}{Colors.ENDC}")
 
-    def handle_displa_data(self, args) -> bool | None:
+    def handle_display_data(self, args: List[str]) -> bool:
         """
-        Handle the display-data command.
+        Handle the display-data command to display file data to CLI.
     
         Args:
             args (list): Command arguments
-            file_entries (list): List of file entries
         """
         file_entries = self.file_handler.get_files()
         if not file_entries:
@@ -232,6 +229,8 @@ class DefaultMode:
                     found = True
             if not found:
                 print(f"{Colors.FAIL}Error: File '{filename}' not found{Colors.ENDC}")
+                return False
+        return True
     
     @staticmethod
     def handle_display_help():
@@ -255,13 +254,15 @@ class DefaultMode:
             print(f"{Colors.WHITE}{cmd.ljust(cmd_width)} | {args.ljust(args_width)} | {desc.ljust(desc_width)}{Colors.ENDC}")
         print(f"{Colors.CYAN}{separator}{Colors.ENDC}\n")
 
-    def handle_rename(self, args) -> None:
+    def handle_rename(self, args: List[str]) -> bool:
         """
         Handle the rename command to rename a file's display name.
-    
+        
         Args:
             args (list): Command arguments (current_name, new_name)
-            file_entries (list): List of file entries
+
+        Returns:
+            bool: True if command was successful, False otherwise
         """
         if len(args) != 2:
             print(f"{Colors.FAIL}Error: rename command requires exactly two arguments: current_name new_name{Colors.ENDC}")
@@ -272,18 +273,20 @@ class DefaultMode:
         # Check if current name exists
         if not self.file_handler.does_filename_exist(current_name):
             print(f"{Colors.FAIL}Error: File '{current_name}' not found{Colors.ENDC}")
-            return
+            return False
 
         # Check if new name exists
         if self.file_handler.does_filename_exist(new_name):
             print(f"{Colors.FAIL}Error: Display name '{new_name}' is already in use{Colors.ENDC}")
-            return
+            return False
 
         did_update_succeed = self.file_handler.update_filename(current_name, new_name)
         if not did_update_succeed:
             print(f'{Colors.CYAN}Failed to update filename, please try again later.{Colors.ENDC}');
+            return False
         else:
             print(f"{Colors.GREEN}Filename has been renamed from '{current_name}' to '{new_name}'.{Colors.ENDC}")
+        return True
 
     def run(self):
         print(f"{Colors.HEADER}Welcome to CSV Reader{Colors.ENDC}")
@@ -291,7 +294,7 @@ class DefaultMode:
 
         while True:
             try:
-                prompt = f'{Colors.BOLD}--csv-reader${Colors.ENDC}'
+                prompt = f'{Colors.BOLD}{Prompts.DefaultMode}{Colors.ENDC}'
                 command = Utility.get_user_input(prompt, self.history)
 
                 if not command:
@@ -309,7 +312,7 @@ class DefaultMode:
                 elif cmd == Commands.FILENAMES:
                     self.handle_display_filenames()
                 elif cmd == Commands.DISPLAY_DATA:
-                    self.handle_displa_data(args)
+                    self.handle_display_data(args)
                 elif cmd == Commands.RENAME:
                     self.handle_rename(args)
                 elif cmd == Commands.HELP:

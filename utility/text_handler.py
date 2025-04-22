@@ -1,5 +1,7 @@
-
 class Text_Handler:
+    """
+    Manages all text manipulation functionalities
+    """
     @staticmethod
     def truncate_text(text: str, max_length: int = 50) -> str:
         """

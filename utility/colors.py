@@ -1,5 +1,8 @@
 # ASNI Color Codes
 class Colors:
+    """
+    Contains all the colors that are used throughout the application
+    """
     HEADER = '\033[95m'         # Purple
     BLUE = '\033[94m'           # Blue
     CYAN = '\033[96m'           # Cyan
