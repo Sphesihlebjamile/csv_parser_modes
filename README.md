@@ -14,8 +14,6 @@ A versatile command-line CSV file reader and parser built with Python. This appl
   - [Commands](#commands)
   - [Examples](#examples)
 - [Project Structure](#project-structure)
-- [SQL Mode & Clean Mode Implementation](#sql-mode--clean-mode-implementation)
-- [Future Roadmap](#future-roadmap)
 - [Contributing](#contributing)
 
 ---
